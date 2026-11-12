@@ -1,0 +1,19 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Build & packaging artifacts
+*.crx
+*.pem
+*.zip
+*.tar.gz
+dist/
+build/
+node_modules/
+
+# Local secrets / notes
+.env
+*.local.*

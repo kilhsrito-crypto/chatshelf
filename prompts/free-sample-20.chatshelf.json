@@ -1,0 +1,190 @@
+{
+  "type": "prompt-pack",
+  "version": 1,
+  "name": "AI Power Prompt Pack — Free Sample",
+  "author": "ChatShelf",
+  "count": 20,
+  "license": "Personal and commercial use of outputs allowed; do not resell or redistribute the pack itself.",
+  "prompts": [
+    {
+      "title": "Clarity Rewrite, Same Voice",
+      "body": "Rewrite the text below so it is clearer and tighter, but keep my voice, my word choices where they work, and every factual claim. Cut filler, fix rhythm, and split sentences over 30 words. After the rewrite, list the 3 biggest changes you made and why.\n\nText:\n[PASTE TEXT]",
+      "tags": [
+        "writing",
+        "power-pack"
+      ],
+      "category": "Writing & Editing"
+    },
+    {
+      "title": "Three Tones, One Message",
+      "body": "Write the message below in three versions: (1) warm and casual, (2) neutral and professional, (3) firm but polite. Keep each under [N] words. Then tell me which version fits best if the reader is [WHO THE READER IS] and I want them to [DESIRED ACTION].\n\nMessage: [WHAT I WANT TO SAY]",
+      "tags": [
+        "writing",
+        "power-pack"
+      ],
+      "category": "Writing & Editing"
+    },
+    {
+      "title": "Explain This Code Like a Senior Dev",
+      "body": "Explain the code below to me as a senior engineer onboarding a new teammate. Cover: what it does in one paragraph, the data flow step by step, non-obvious decisions, and anything that looks risky (bugs, edge cases, performance, security). Language: [LANGUAGE].\n\n```\n[PASTE CODE]\n```",
+      "tags": [
+        "coding",
+        "power-pack"
+      ],
+      "category": "Coding & Debugging"
+    },
+    {
+      "title": "Debug with Hypotheses",
+      "body": "I have a bug. Expected: [EXPECTED]. Actual: [ACTUAL]. Error/log output: [ERROR]. Relevant code below.\nDon't jump to a fix. First list the 3-5 most likely causes ranked by probability, with how to confirm or rule out each one in under 2 minutes. Then give the fix for the most likely cause.\n\n```\n[PASTE CODE]\n```",
+      "tags": [
+        "coding",
+        "power-pack"
+      ],
+      "category": "Coding & Debugging"
+    },
+    {
+      "title": "Feynman Explainer",
+      "body": "Teach me [CONCEPT] using the Feynman technique: explain it simply, identify the part beginners usually misunderstand, give a concrete example, then a slightly harder example. Finish with 3 questions I should be able to answer if I truly understood.",
+      "tags": [
+        "learning",
+        "power-pack"
+      ],
+      "category": "Learning & Study"
+    },
+    {
+      "title": "Socratic Tutor",
+      "body": "Act as a Socratic tutor for [SUBJECT / TOPIC]. My current level: [BEGINNER / INTERMEDIATE / ADVANCED]. Ask me one question at a time, wait for my answer, correct misconceptions gently, and increase difficulty when I get two right in a row. Start now.",
+      "tags": [
+        "learning",
+        "power-pack"
+      ],
+      "category": "Learning & Study"
+    },
+    {
+      "title": "Meeting Notes to Action Items",
+      "body": "Turn these raw meeting notes into: a 3-sentence summary, decisions made, action items as a table (owner | task | deadline), and open questions. If an owner or deadline is missing, write \"UNASSIGNED\" rather than guessing.\n\nNotes:\n[PASTE NOTES]",
+      "tags": [
+        "work",
+        "power-pack"
+      ],
+      "category": "Work & Productivity"
+    },
+    {
+      "title": "Weekly Status Update",
+      "body": "Write my weekly status update for [AUDIENCE, e.g. my manager]. Format: Done, In progress, Blocked (with what I need), Next week. Keep it under 150 words, lead with the most important item, and turn vague items into specific outcomes.\n\nMy raw list:\n[PASTE]",
+      "tags": [
+        "work",
+        "power-pack"
+      ],
+      "category": "Work & Productivity"
+    },
+    {
+      "title": "Customer Persona from Real Data",
+      "body": "Based on these customer reviews / interview notes / support tickets: [PASTE], build 2-3 customer personas. For each: goals, frustrations, the exact words they use, objections before buying, and where they hang out online. Quote the source text that supports each point.",
+      "tags": [
+        "marketing",
+        "power-pack"
+      ],
+      "category": "Marketing & Sales"
+    },
+    {
+      "title": "Landing Page Copy",
+      "body": "Write landing page copy for [PRODUCT]. Audience: [AUDIENCE]. Main benefit: [BENEFIT]. Proof: [PROOF / TESTIMONIALS / NUMBERS — only use what I give you]. Sections: hero headline + subhead, 3 benefit blocks, how it works (3 steps), objection-handling FAQ (5 Qs), and CTA. Plain language, no hype.",
+      "tags": [
+        "marketing",
+        "power-pack"
+      ],
+      "category": "Marketing & Sales"
+    },
+    {
+      "title": "Resume Bullet Upgrade",
+      "body": "Rewrite these resume bullets using the format: action verb + what I did + measurable result. If a bullet has no number, ask me a question that could get one instead of inventing it. Target role: [ROLE].\n\nBullets:\n[PASTE BULLETS]",
+      "tags": [
+        "career",
+        "power-pack"
+      ],
+      "category": "Career & Job Search"
+    },
+    {
+      "title": "Tailor Resume to Job Post",
+      "body": "Here's a job description: [PASTE JD]. Here's my resume: [PASTE RESUME]. List the top 10 requirements in the JD, map each to evidence in my resume (strong / weak / missing), and suggest specific edits. Don't add experience I don't have.",
+      "tags": [
+        "career",
+        "power-pack"
+      ],
+      "category": "Career & Job Search"
+    },
+    {
+      "title": "Devil's Advocate",
+      "body": "I'm planning to [DECISION / PLAN]. Argue against it as hard as you reasonably can. Then tell me which of your arguments is the strongest and what evidence would settle it.",
+      "tags": [
+        "thinking",
+        "power-pack"
+      ],
+      "category": "Thinking & Decisions"
+    },
+    {
+      "title": "First Principles Breakdown",
+      "body": "Break down [PROBLEM] using first principles: list the assumptions everyone makes, mark which are actually true vs. convention, then rebuild a solution from the true fundamentals. Give one unconventional idea that comes out of it.",
+      "tags": [
+        "thinking",
+        "power-pack"
+      ],
+      "category": "Thinking & Decisions"
+    },
+    {
+      "title": "Research Plan",
+      "body": "I need to research [QUESTION] for [PURPOSE]. Create a research plan: key sub-questions, what kind of sources would answer each (papers, datasets, interviews, official docs), search terms to use, and how to judge source quality. Don't cite specific sources unless you're sure they exist.",
+      "tags": [
+        "research",
+        "power-pack"
+      ],
+      "category": "Research & Analysis"
+    },
+    {
+      "title": "Summarize and Critique a Paper",
+      "body": "Summarize the paper/article below: research question, method, key findings, and limitations. Then critique it: sample size, confounders, whether conclusions follow from data, and what a skeptical reviewer would ask.\n\nText:\n[PASTE]",
+      "tags": [
+        "research",
+        "power-pack"
+      ],
+      "category": "Research & Analysis"
+    },
+    {
+      "title": "Weekly Meal Plan",
+      "body": "Plan 7 days of [BREAKFAST / LUNCH / DINNER] for [N] people. Constraints: [DIET / ALLERGIES], budget about [BUDGET], max [N] minutes of cooking on weekdays. Reuse ingredients across meals to reduce waste, and give a grouped shopping list.",
+      "tags": [
+        "personal",
+        "power-pack"
+      ],
+      "category": "Personal & Everyday"
+    },
+    {
+      "title": "Trip Itinerary",
+      "body": "Plan a [N]-day trip to [PLACE] for [WHO] who like [INTERESTS]. Pace: [RELAXED / BALANCED / PACKED]. Group activities by neighborhood to cut travel time, include one rainy-day option per day, and note things to book in advance. Mark anything I should double-check because it may have changed.",
+      "tags": [
+        "personal",
+        "power-pack"
+      ],
+      "category": "Personal & Everyday"
+    },
+    {
+      "title": "Prompt Improver",
+      "body": "Improve the prompt below. First, tell me what's ambiguous or missing (role, context, format, constraints, examples). Then write an improved version, and a short explanation of why each change helps.\n\nMy prompt:\n[PASTE PROMPT]",
+      "tags": [
+        "ai",
+        "power-pack"
+      ],
+      "category": "AI Power-User Meta Prompts"
+    },
+    {
+      "title": "Ask Me Questions First",
+      "body": "Before you answer, ask me up to 5 clarifying questions that would most improve your response to the task below. Wait for my answers before doing the task.\n\nTask: [TASK]",
+      "tags": [
+        "ai",
+        "power-pack"
+      ],
+      "category": "AI Power-User Meta Prompts"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatShelf</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>ChatShelf</h1>
+      <p class="sub" id="plan-label">Free plan</p>
+    </div>
+    <a href="../options/options.html" target="_blank" class="gear" title="Settings">⚙</a>
+  </header>
+
+  <section class="limits" id="limits"></section>
+
+  <section>
+    <h2>Folders</h2>
+    <ul id="folder-list" class="list"></ul>
+    <div class="row">
+      <input id="folder-name" type="text" placeholder="New folder" maxlength="80" />
+      <button id="add-folder" type="button">Add</button>
+    </div>
+    <p class="hint" id="folder-hint"></p>
+  </section>
+
+  <section>
+    <h2>Prompts</h2>
+    <ul id="prompt-list" class="list"></ul>
+    <details>
+      <summary>Add prompt</summary>
+      <input id="prompt-title" type="text" placeholder="Title" maxlength="100" />
+      <textarea id="prompt-body" rows="3" placeholder="Prompt text"></textarea>
+      <button id="add-prompt" type="button">Save prompt</button>
+    </details>
+    <p class="hint" id="prompt-hint"></p>
+  </section>
+
+  <section>
+    <h2>On this page</h2>
+    <p class="hint" id="page-hint">Open chatgpt.com or claude.ai to use the floating panel.</p>
+    <button id="insert-selected" type="button" class="secondary" disabled>Insert selected prompt into page</button>
+  </section>
+
+  <div class="upgrade-box" id="upgrade-box" hidden>
+    <p>Need unlimited folders &amp; prompts? Pro is a one-time purchase.</p>
+    <button id="upgrade-btn" type="button" class="upgrade">Get ChatShelf Pro</button>
+    <p class="hint"><a href="#" id="have-key">Already have a license key?</a></p>
+  </div>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

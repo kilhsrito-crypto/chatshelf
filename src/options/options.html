@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatShelf Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>ChatShelf Settings</h1>
+      <p class="muted">Local-first organizer for ChatGPT &amp; Claude. Data stays in your browser.</p>
+    </header>
+
+    <section class="card">
+      <h2>Plan &amp; license</h2>
+      <p id="plan-status" class="muted">Free plan</p>
+      <label for="license-key">Gumroad license key</label>
+      <div class="row">
+        <input id="license-key" type="text" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" autocomplete="off" spellcheck="false" />
+        <button id="activate-license" type="button">Activate</button>
+      </div>
+      <p id="license-msg" class="hint"></p>
+      <div class="row">
+        <button id="buy-pro" type="button" class="secondary">Get ChatShelf Pro</button>
+        <button id="deactivate-license" type="button" class="secondary" hidden>Remove key from this browser</button>
+      </div>
+      <p class="muted small">Your key is sent only to Gumroad's license API (<code>api.gumroad.com</code>) to confirm the purchase. ChatShelf is open source; Pro funds development.</p>
+    </section>
+
+    <section class="card">
+      <h2>Backup</h2>
+      <div class="row">
+        <button id="export-btn" type="button" class="secondary">Export JSON</button>
+        <label class="file-btn secondary">
+          Import JSON / prompt pack
+          <input id="import-file" type="file" accept="application/json,.json" hidden />
+        </label>
+      </div>
+      <p id="backup-msg" class="hint"></p>
+    </section>
+
+    <section class="card">
+      <h2>Privacy</h2>
+      <p>ChatShelf stores folders, chat bookmarks (title + URL + note), and prompt text only in <code>chrome.storage.local</code>. No analytics and no cloud sync. The only network request is the optional Pro license check to Gumroad.</p>
+      <p><a href="../../PRIVACY.md" target="_blank" rel="noopener">Read PRIVACY.md</a></p>
+    </section>
+
+    <section class="card">
+      <h2>About</h2>
+      <p><strong>ChatShelf</strong> v0.2.0 · MIT licensed</p>
+      <ul class="muted small">
+        <li>ChatGPT: supported</li>
+        <li>Claude.ai: beta (composer selectors may break)</li>
+      </ul>
+    </section>
+  </main>
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
