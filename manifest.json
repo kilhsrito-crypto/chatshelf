@@ -1,0 +1,84 @@
+{
+  "manifest_version": 3,
+  "name": "ChatShelf — AI Chat Organizer",
+  "short_name": "ChatShelf",
+  "version": "0.2.0",
+  "description": "Organize ChatGPT & Claude chats into folders and reuse prompt snippets. Open source, local-first. Optional Pro unlock.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://api.gumroad.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "ChatShelf",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "src/options/options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/storage.js",
+        "src/content/adapters/chatgpt.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "styles/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/storage.js",
+        "src/content/adapters/claude.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "styles/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "styles/*"
+      ],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*"
+      ]
+    }
+  ],
+  "homepage_url": "https://github.com/REPLACE_ME/chatshelf"
+}
