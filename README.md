@@ -16,6 +16,10 @@ Open source · local-first · no account · no tracking</p>
 
 ---
 
+<p align="center">
+  <img src="docs/cover-1280x720.png" alt="ChatShelf Pro: unlimited folders and a prompt library for ChatGPT and Claude" />
+</p>
+
 Your ChatGPT sidebar has 400 chats called "New chat". You retype the same prompts every day. **ChatShelf** fixes both:
 
 - 📁 **Save any conversation into a folder** (title, link, and a note) with one click from a floating button on the page.
@@ -28,7 +32,9 @@ Your ChatGPT sidebar has 400 chats called "New chat". You retype the same prompt
   <img src="docs/options.png" width="420" alt="ChatShelf settings page" />
 </p>
 
-> 🎬 _Demo GIF coming soon: `docs/demo.gif` (save chat → folder → insert prompt)._
+<p align="center">
+  <img src="docs/demo.gif" width="720" alt="ChatShelf demo: product cover, popup with folders and prompts, and the settings page" />
+</p>
 
 ## Features
 
@@ -134,7 +140,7 @@ Run `server/license-proxy.py` on the host behind that name and set `CREEM_API_KE
 
 ## Roadmap
 
-- [ ] Demo GIF
+- [x] Demo GIF
 - [ ] Search across saved chats and prompts
 - [ ] Drag-and-drop chats between folders
 - [ ] Prompt variables (fill `[BRACKETS]` before inserting)
