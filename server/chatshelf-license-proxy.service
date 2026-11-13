@@ -1,0 +1,26 @@
+[Unit]
+Description=ChatShelf Creem license proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+WorkingDirectory=/opt/chatshelf
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/chatshelf/creem.env
+ExecStart=/usr/bin/python3 /opt/chatshelf/license-proxy.py
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+LockPersonality=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

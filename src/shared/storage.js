@@ -1,7 +1,7 @@
 /**
  * ChatShelf — chrome.storage.local helpers + free-tier limit checks.
  * License: isPro() reads cs_license; validateLicense() asks the service worker
- * to call Gumroad's public license verify API.
+ * to call the ChatShelf license proxy (Creem API key stays on the server).
  */
 (function (root) {
   const C = root.ChatShelfConstants;
@@ -28,12 +28,12 @@
   }
 
   function isPro(license) {
-    return license && license.plan === "pro" && !!license.licenseKey;
+    return !!(license && license.plan === "pro" && license.licenseKey && license.instanceId);
   }
 
   /**
-   * Verify a Gumroad license key via the service worker (which has
-   * host permission for api.gumroad.com, so no CORS issue).
+   * Activate a license key via the service worker (host permission for
+   * chatshelf.naruhodoowl.me). The worker stores instance_id for later checks.
    * @param {string} key
    * @returns {Promise<{ok:boolean, plan?:string, error?:string}>}
    */
@@ -53,9 +53,20 @@
     });
   }
 
-  async function deactivateLicense() {
-    await setPartial({ [C.STORAGE_KEYS.license]: { ...C.DEFAULT_LICENSE } });
-    return { ok: true };
+  function deactivateLicense() {
+    return new Promise((resolve) => {
+      try {
+        chrome.runtime.sendMessage({ type: C.MSG.DEACTIVATE_LICENSE }, (res) => {
+          if (chrome.runtime.lastError) {
+            resolve({ ok: false, error: chrome.runtime.lastError.message });
+          } else {
+            resolve(res || { ok: false, error: "No response from background." });
+          }
+        });
+      } catch (err) {
+        resolve({ ok: false, error: String((err && err.message) || err) });
+      }
+    });
   }
 
   async function setLicense(license) {

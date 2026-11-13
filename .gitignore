@@ -13,7 +13,12 @@ Thumbs.db
 dist/
 build/
 node_modules/
+__pycache__/
+*.pyc
 
 # Local secrets / notes
 .env
 *.local.*
+server/creem.env
+creem_api_key
+**/creem_api_key
