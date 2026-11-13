@@ -23,7 +23,15 @@
   });
 
   $("deactivate-license").addEventListener("click", async () => {
-    await Storage.deactivateLicense();
+    $("deactivate-license").disabled = true;
+    const res = await Storage.deactivateLicense();
+    $("deactivate-license").disabled = false;
+    if (!res.ok) {
+      $("license-msg").textContent = res.error || "Couldn't remove the key.";
+      $("license-msg").className = "hint err";
+      refreshPlan();
+      return;
+    }
     $("license-key").value = "";
     $("license-msg").textContent = "Key removed. You're on the free plan.";
     $("license-msg").className = "hint";
@@ -38,7 +46,7 @@
       return;
     }
     $("activate-license").disabled = true;
-    $("license-msg").textContent = "Checking with Gumroad…";
+    $("license-msg").textContent = "Checking license…";
     $("license-msg").className = "hint";
     const res = await Storage.validateLicense(key);
     $("activate-license").disabled = false;

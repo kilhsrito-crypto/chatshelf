@@ -98,7 +98,7 @@
     const toast = document.createElement("div");
     toast.className = "cs-toast";
     toast.textContent =
-      "Opening ChatShelf Pro on Gumroad. After purchase, paste your license key in Settings.";
+      "Opening ChatShelf Pro. After purchase, paste your license key in Settings.";
     document.getElementById(ROOT_ID)?.appendChild(toast);
     setTimeout(() => toast.remove(), 3200);
     chrome.runtime.sendMessage({ type: C.MSG.OPEN_UPGRADE, action: "buy" });

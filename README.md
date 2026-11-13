@@ -64,12 +64,12 @@ Settings (⚙ in the popup) → **Import JSON / prompt pack** → choose [`promp
 ChatShelf is free and MIT-licensed. If it saves you time, **Pro** removes the limits and funds development:
 
 - Unlimited folders and prompts
-- One-time purchase, use it in up to 3 browsers
-- 👉 **[Get ChatShelf Pro on Gumroad](https://REPLACE_ME.gumroad.com/l/chatshelf-pro)**
+- One-time purchase ($7), use it in up to 3 browsers
+- 👉 **[Get ChatShelf Pro on Creem](https://www.creem.io/product/prod_3FqFPPZL4T22ud6OFOyhgg)**
 
-After buying, open **Settings → Gumroad license key**, paste the key from your receipt, and click **Activate**.
+After buying, open **Settings → License key**, paste the key from your Creem receipt, and click **Activate**. The first successful activation registers this browser. Later checks reuse that activation.
 
-Want 125 ready-to-use prompts to fill your library? → **[AI Power Prompt Pack](https://REPLACE_ME.gumroad.com/l/ai-power-prompts)** (PDF + Markdown + CSV + ChatShelf JSON).
+A separate paid prompt pack is not linked from this build. Import the free sample instead: [`prompts/free-sample-20.chatshelf.json`](prompts/free-sample-20.chatshelf.json).
 
 > **Yes, you could edit the code and remove the limit.** It's open source, and that's fine for personal tinkering. Buying Pro is how you say thanks and keep the updates coming when ChatGPT changes its page again.
 
@@ -77,7 +77,7 @@ Want 125 ready-to-use prompts to fill your library? → **[AI Power Prompt Pack]
 
 - Data is stored only in `chrome.storage.local` on your device.
 - The extension reads the current page's title and URL **only when you click Save**. It never copies your chat messages.
-- The only network request ChatShelf makes is the optional Pro license check to `api.gumroad.com`, which sends your license key and the product ID.
+- The only network request ChatShelf makes is the optional Pro license check to `https://chatshelf.naruhodoowl.me`, which sends your license key and a random install id. The Creem API key stays on that server.
 - Full policy: [PRIVACY.md](PRIVACY.md)
 
 ### Permissions explained
@@ -87,23 +87,24 @@ Want 125 ready-to-use prompts to fill your library? → **[AI Power Prompt Pack]
 | `storage` | Save folders, bookmarks, and prompts locally |
 | `activeTab` | Read the current tab's title/URL when you click Save |
 | `chatgpt.com`, `chat.openai.com`, `claude.ai` | Show the floating panel and insert prompts |
-| `api.gumroad.com` | Verify a Pro license key (only when you activate or re-check) |
+| `chatshelf.naruhodoowl.me` | Activate or re-check a Pro license key |
 
 ## How it works
 
 ```
 manifest.json
 src/
-├── background/service-worker.js   # message router + Gumroad license verify
+├── background/service-worker.js   # message router + Creem license proxy client
 ├── content/content.js             # floating panel UI
 ├── content/adapters/chatgpt.js    # site-specific selectors (title, composer)
 ├── content/adapters/claude.js
 ├── popup/                         # toolbar popup
 ├── options/                       # settings, license, backup/import
 └── shared/
-    ├── constants.js               # free limits, Gumroad config, storage keys
+    ├── constants.js               # free limits, Creem product config, storage keys
     └── storage.js                 # CRUD, limit gates, prompt-pack import
 prompts/free-sample-20.chatshelf.json
+server/license-proxy.py            # stdlib proxy: Creem API key stays here
 ```
 
 Site-specific DOM code lives in `src/content/adapters/`. When ChatGPT or Claude changes its markup, that's usually the only file that needs a fix.
@@ -125,7 +126,11 @@ Importing a pack **merges** prompts into your library (duplicates are skipped); 
 
 ### For forks / self-publishers
 
-Gumroad settings are in `src/shared/constants.js` → `GUMROAD` (`PRODUCT_ID`, `PRODUCT_URL`). Verification uses Gumroad's public [license verify API](https://gumroad.com/api#licenses) (`POST /v2/licenses/verify`, no API key). The first activation counts one use; weekly re-checks use `increment_uses_count=false` and never downgrade you while you're offline.
+Checkout is the Creem product `prod_3FqFPPZL4T22ud6OFOyhgg` (`LICENSE` in `src/shared/constants.js`). The extension never calls `api.creem.io` and must not contain `CREEM_API_KEY`. It POSTs to `https://chatshelf.naruhodoowl.me/api/licenses/{activate,validate,deactivate}`.
+
+Run `server/license-proxy.py` on the host behind that name and set `CREEM_API_KEY` only on the server. See [server/README.md](server/README.md). A key stays inactive until the first successful activation; the extension stores `instance_id` and weekly re-checks call validate. Offline errors keep Pro.
+
+`LICENSE.PROMPT_PACK_URL` is intentionally empty. Do not point it at a store URL you do not control.
 
 ## Roadmap
 

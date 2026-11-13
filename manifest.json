@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ChatShelf — AI Chat Organizer",
   "short_name": "ChatShelf",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Organize ChatGPT & Claude chats into folders and reuse prompt snippets. Open source, local-first. Optional Pro unlock.",
   "permissions": [
     "storage",
@@ -12,7 +12,7 @@
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://claude.ai/*",
-    "https://api.gumroad.com/*"
+    "https://chatshelf.naruhodoowl.me/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js"
@@ -80,5 +80,5 @@
       ]
     }
   ],
-  "homepage_url": "https://github.com/REPLACE_ME/chatshelf"
+  "homepage_url": "https://github.com/kilhsrito-crypto/chatshelf"
 }

@@ -1,15 +1,10 @@
 /**
- * ChatShelf service worker — message router, upgrade opener, and
- * Gumroad license verification (POST https://api.gumroad.com/v2/licenses/verify).
+ * ChatShelf service worker — message router and Creem license checks.
+ * Calls https://chatshelf.naruhodoowl.me only. The Creem API key stays on the proxy.
  */
 importScripts("../shared/constants.js");
 
 const C = self.ChatShelfConstants;
-const MSG = {
-  OPEN_UPGRADE: C.MSG.OPEN_UPGRADE,
-  VERIFY_LICENSE: C.MSG.VERIFY_LICENSE,
-  GET_TAB_INFO: "CS_GET_TAB_INFO",
-};
 const LICENSE_KEY = C.STORAGE_KEYS.license;
 
 chrome.runtime.onInstalled.addListener((details) => {
@@ -28,12 +23,7 @@ chrome.runtime.onInstalled.addListener((details) => {
             showFloatingButton: true,
             defaultFolderId: id,
           },
-          cs_license: {
-            plan: "free",
-            licenseKey: null,
-            validatedAt: null,
-            expiresAt: null,
-          },
+          cs_license: { ...C.DEFAULT_LICENSE },
         });
       }
     });
@@ -43,25 +33,35 @@ chrome.runtime.onInstalled.addListener((details) => {
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (!msg || !msg.type) return;
 
-  if (msg.type === MSG.OPEN_UPGRADE) {
+  if (msg.type === C.MSG.OPEN_UPGRADE) {
     if (msg.action === "options") {
       chrome.runtime.openOptionsPage();
+      sendResponse({ ok: true });
     } else if (msg.action === "prompt-pack") {
-      chrome.tabs.create({ url: C.GUMROAD.PROMPT_PACK_URL });
+      if (!C.LICENSE.PROMPT_PACK_URL) {
+        sendResponse({ ok: false, error: "Prompt pack link is not configured." });
+      } else {
+        chrome.tabs.create({ url: C.LICENSE.PROMPT_PACK_URL });
+        sendResponse({ ok: true });
+      }
     } else {
-      // Default: open the Gumroad product page for ChatShelf Pro.
-      chrome.tabs.create({ url: C.GUMROAD.PRODUCT_URL });
+      chrome.tabs.create({ url: C.LICENSE.PRODUCT_URL });
+      sendResponse({ ok: true });
     }
-    sendResponse({ ok: true });
     return true;
   }
 
-  if (msg.type === MSG.VERIFY_LICENSE) {
+  if (msg.type === C.MSG.VERIFY_LICENSE) {
     activateLicense(String(msg.licenseKey || "").trim()).then(sendResponse);
     return true;
   }
 
-  if (msg.type === MSG.GET_TAB_INFO) {
+  if (msg.type === C.MSG.DEACTIVATE_LICENSE) {
+    deactivateThisBrowser().then(sendResponse);
+    return true;
+  }
+
+  if (msg.type === "CS_GET_TAB_INFO") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
       sendResponse({
@@ -95,103 +95,212 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// Gumroad license verification
-// Docs: https://gumroad.com/api#licenses  (no OAuth / API key required)
-//   POST product_id, license_key, increment_uses_count ("true"/"false")
-//   200 {success:true, uses, purchase:{refunded, disputed, chargebacked, ...}}
-//   404 {success:false, message}
-// ---------------------------------------------------------------------------
+function networkFailure() {
+  return {
+    ok: false,
+    definitive: false,
+    code: "unavailable",
+    error: C.LICENSE_ERRORS.unavailable,
+  };
+}
 
-/**
- * @returns {Promise<{ok:boolean, definitive?:boolean, data?:object, error?:string}>}
- *   definitive=true means Gumroad answered (key really invalid), false = network issue.
- */
-async function gumroadVerify(licenseKey, incrementUses) {
-  if (!C.isGumroadConfigured()) {
-    return {
-      ok: false,
-      definitive: false,
-      error: "Pro checkout is not configured in this build (GUMROAD.PRODUCT_ID placeholder).",
-    };
-  }
+async function postLicense(path, payload) {
   let res;
   try {
-    res = await fetch(C.GUMROAD.VERIFY_URL, {
+    res = await fetch(C.LICENSE.API_BASE + path, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        product_id: C.GUMROAD.PRODUCT_ID,
-        license_key: licenseKey,
-        increment_uses_count: incrementUses ? "true" : "false",
-      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+      signal: AbortSignal.timeout(20000),
     });
-  } catch (err) {
-    return { ok: false, definitive: false, error: "Network error — try again. " + (err?.message || "") };
+  } catch (_) {
+    return { network: true };
   }
   let data = null;
   try {
     data = await res.json();
   } catch (_) {
-    /* non-JSON */
+    data = null;
   }
-  if (!res.ok || !data || data.success !== true) {
-    const definitive = res.status === 404 || (data && data.success === false && res.status < 500);
-    return { ok: false, definitive, error: data?.message || `Gumroad returned HTTP ${res.status}` };
+  return { network: false, status: res.status, data };
+}
+
+async function readLicense() {
+  const data = await chrome.storage.local.get([LICENSE_KEY]);
+  return { ...C.DEFAULT_LICENSE, ...(data[LICENSE_KEY] || {}) };
+}
+
+async function getInstanceName() {
+  const key = C.INSTALL_ID_KEY;
+  const data = await chrome.storage.local.get([key]);
+  const existing = data[key];
+  if (typeof existing === "string" && /^cs-[a-z0-9]{8,40}$/.test(existing)) {
+    return existing;
   }
-  const p = data.purchase || {};
-  if (p.refunded || p.chargebacked || (p.disputed && !p.dispute_won)) {
-    return { ok: false, definitive: true, error: "This purchase was refunded or disputed." };
+  const name = C.newInstallId();
+  await chrome.storage.local.set({ [key]: name });
+  return name;
+}
+
+function licenseRecord(licenseKey, interpreted) {
+  return {
+    plan: "pro",
+    licenseKey,
+    instanceId: interpreted.instanceId,
+    validatedAt: Date.now(),
+    expiresAt: interpreted.expiresAt || null,
+    status: "active",
+  };
+}
+
+/** Best-effort slot release. Network errors stay ok:false so the caller can retry. */
+async function releaseRemote(lic) {
+  if (!lic || !lic.licenseKey || !lic.instanceId) return { ok: true };
+  const result = await postLicense(C.LICENSE.DEACTIVATE_PATH, {
+    key: lic.licenseKey,
+    instance_id: lic.instanceId,
+  });
+  if (result.network) return networkFailure();
+  if (result.status === 200 || result.status === 404 || result.status === 409 || result.status === 410) {
+    return { ok: true };
   }
-  if (p.subscription_ended_at || p.subscription_cancelled_at || p.subscription_failed_at) {
-    return { ok: false, definitive: true, error: "The subscription for this key is no longer active." };
+  const mapped = C.mapLicenseHttpFailure(result.status, result.data);
+  if (
+    mapped.code === "invalid_key" ||
+    mapped.code === "not_active" ||
+    mapped.code === "already_inactive" ||
+    mapped.code === "expired" ||
+    mapped.code === "revoked" ||
+    mapped.code === "expired_or_revoked"
+  ) {
+    return { ok: true };
   }
-  return { ok: true, data };
+  return { ok: false, error: mapped.error };
+}
+
+async function downgrade(message) {
+  const current = await readLicense();
+  if (current.plan !== "pro") return;
+  await chrome.storage.local.set({
+    [LICENSE_KEY]: { ...C.DEFAULT_LICENSE, lastError: message },
+  });
+}
+
+function isFatalCode(code) {
+  return code === "expired" || code === "revoked" || code === "expired_or_revoked" || code === "invalid_key";
 }
 
 async function activateLicense(licenseKey) {
   if (!licenseKey) return { ok: false, error: "Paste a license key first." };
-  // Count this activation once (increment_uses_count=true).
-  const r = await gumroadVerify(licenseKey, true);
-  if (!r.ok) return { ok: false, error: r.error };
-  const uses = Number(r.data.uses || 0);
-  if (uses > C.GUMROAD.MAX_USES) {
-    return {
-      ok: false,
-      error: `This key has been activated ${uses} times (limit ${C.GUMROAD.MAX_USES}). Reply to your Gumroad receipt to reset it.`,
-    };
+  const instanceName = await getInstanceName();
+  const stored = await readLicense();
+  const switching = !!(stored.licenseKey && stored.instanceId && stored.licenseKey !== licenseKey);
+
+  // Same key already activated here: validate instead of spending another slot.
+  if (!switching && stored.licenseKey === licenseKey && stored.instanceId) {
+    const checked = await postLicense(C.LICENSE.VALIDATE_PATH, {
+      key: licenseKey,
+      instance_id: stored.instanceId,
+    });
+    if (checked.network) return networkFailure();
+    if (checked.status === 200) {
+      const interpreted = C.interpretLicense(checked.data, C.LICENSE.PRODUCT_ID);
+      if (interpreted.ok) {
+        const license = licenseRecord(licenseKey, interpreted);
+        await chrome.storage.local.set({ [LICENSE_KEY]: license });
+        return { ok: true, plan: "pro", license };
+      }
+      if (interpreted.code !== "not_active") {
+        if (isFatalCode(interpreted.code)) await downgrade(interpreted.error);
+        return { ok: false, error: interpreted.error };
+      }
+    } else {
+      const mapped = C.mapLicenseHttpFailure(checked.status, checked.data);
+      if (!mapped.definitive) return { ok: false, error: mapped.error };
+      const retry =
+        mapped.code === "not_active" ||
+        mapped.code === "invalid_key" ||
+        mapped.code === "bad_request" ||
+        mapped.code === "already_inactive";
+      if (!retry) {
+        if (isFatalCode(mapped.code)) await downgrade(mapped.error);
+        return { ok: false, error: mapped.error };
+      }
+    }
   }
-  const license = {
-    ...C.DEFAULT_LICENSE,
-    plan: "pro",
-    licenseKey,
-    validatedAt: Date.now(),
-    expiresAt: null,
-    email: r.data.purchase?.email || null,
-    uses,
-  };
+
+  const activated = await postLicense(C.LICENSE.ACTIVATE_PATH, {
+    key: licenseKey,
+    instance_name: instanceName,
+  });
+  if (activated.network) return networkFailure();
+  if (activated.status !== 200) {
+    const mapped = C.mapLicenseHttpFailure(activated.status, activated.data);
+    if (!switching && isFatalCode(mapped.code)) await downgrade(mapped.error);
+    return { ok: false, error: mapped.error };
+  }
+  const interpreted = C.interpretLicense(activated.data, C.LICENSE.PRODUCT_ID);
+  if (!interpreted.ok) {
+    // Activate already counted. Drop the instance when this key is not Pro.
+    if (interpreted.instanceId) {
+      await releaseRemote({ licenseKey, instanceId: interpreted.instanceId });
+    }
+    if (!switching && isFatalCode(interpreted.code)) await downgrade(interpreted.error);
+    return { ok: false, error: interpreted.error };
+  }
+  const license = licenseRecord(licenseKey, interpreted);
   await chrome.storage.local.set({ [LICENSE_KEY]: license });
+  // Free the previous browser slot only after the new key is stored.
+  if (switching) await releaseRemote(stored);
   return { ok: true, plan: "pro", license };
 }
 
-/** Silent periodic re-check. Only downgrades on a definitive Gumroad "no". */
+async function deactivateThisBrowser() {
+  const lic = await readLicense();
+  const released = await releaseRemote(lic);
+  if (!released.ok) return { ok: false, error: released.error };
+  await chrome.storage.local.set({ [LICENSE_KEY]: { ...C.DEFAULT_LICENSE } });
+  return { ok: true };
+}
+
+/** Weekly re-check. Only downgrades when the proxy gives a definite no. */
 async function recheckLicense() {
-  const data = await chrome.storage.local.get([LICENSE_KEY]);
-  const lic = data[LICENSE_KEY];
-  if (!lic || lic.plan !== "pro" || !lic.licenseKey) return;
+  const lic = await readLicense();
+  if (lic.plan !== "pro" || !lic.licenseKey || !lic.instanceId) return;
   const ageMs = Date.now() - (lic.validatedAt || 0);
-  if (ageMs < C.GUMROAD.RECHECK_DAYS * 86400000) return;
-  const r = await gumroadVerify(lic.licenseKey, false);
-  if (r.ok) {
-    await chrome.storage.local.set({ [LICENSE_KEY]: { ...lic, validatedAt: Date.now() } });
-  } else if (r.definitive) {
+  if (ageMs < C.LICENSE.RECHECK_DAYS * 86400000) return;
+  const result = await postLicense(C.LICENSE.VALIDATE_PATH, {
+    key: lic.licenseKey,
+    instance_id: lic.instanceId,
+  });
+  if (result.network) return;
+  if (result.status === 200) {
+    const interpreted = C.interpretLicense(result.data, C.LICENSE.PRODUCT_ID);
+    if (interpreted.ok) {
+      await chrome.storage.local.set({
+        [LICENSE_KEY]: licenseRecord(lic.licenseKey, interpreted),
+      });
+      return;
+    }
+    if (!interpreted.definitive) return;
     await chrome.storage.local.set({
-      [LICENSE_KEY]: { ...C.DEFAULT_LICENSE, lastError: r.error },
+      [LICENSE_KEY]: { ...C.DEFAULT_LICENSE, lastError: interpreted.error },
     });
+    return;
   }
-  // Network errors: keep Pro (offline-friendly).
+  const mapped = C.mapLicenseHttpFailure(result.status, result.data);
+  if (!mapped.definitive) return;
+  await chrome.storage.local.set({
+    [LICENSE_KEY]: { ...C.DEFAULT_LICENSE, lastError: mapped.error },
+  });
 }
 
 chrome.runtime.onStartup.addListener(() => {
   recheckLicense();
 });
+
+recheckLicense();
