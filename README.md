@@ -8,6 +8,7 @@ Open source · local-first · no account · no tracking</p>
 
 <p align="center">
   <a href="#install-in-60-seconds">Install</a> ·
+  <a href="#how-to-use">Usage</a> ·
   <a href="#features">Features</a> ·
   <a href="#chatshelf-pro">Pro</a> ·
   <a href="#privacy">Privacy</a> ·
@@ -64,6 +65,28 @@ To update: pull or download the new version, then click **Reload** on the extens
 ### Try the free prompt sample
 
 Settings (⚙ in the popup) → **Import JSON / prompt pack** → choose [`prompts/free-sample-20.chatshelf.json`](prompts/free-sample-20.chatshelf.json). It adds hand-written prompts for writing, coding, learning, work, and more. (Free plan keeps the first 10.)
+
+## How to use
+
+### Save a chat to a folder
+
+1. Open [chatgpt.com](https://chatgpt.com) or [claude.ai](https://claude.ai).
+2. Click the purple folder button in the bottom-right corner to open the floating panel.
+3. Pick a folder (create one first in the toolbar popup if you need to) and save the current chat. ChatShelf stores the title, page URL, and an optional note — not the message text.
+
+### Build a prompt library
+
+1. Click the ChatShelf icon in the Chrome toolbar to open the popup.
+2. Under **Prompts**, open **Add prompt**, enter a title and the prompt text, then save.
+3. On a ChatGPT or Claude tab, select a prompt and click **Insert selected prompt into page** to paste it into the composer.
+
+You can also import a pack from Settings (⚙ in the popup) → **Import JSON / prompt pack**. A ready-made sample is [`prompts/free-sample-20.chatshelf.json`](prompts/free-sample-20.chatshelf.json). The free plan allows 2 folders and 10 prompts.
+
+### Settings, backup, and Pro
+
+- Open **Settings** from the ⚙ in the popup.
+- **Export JSON** backs up your folders and prompts; **Import JSON** restores a backup or merges a prompt pack (duplicates are skipped).
+- To unlock unlimited folders and prompts, buy [ChatShelf Pro](https://www.creem.io/product/prod_3FqFPPZL4T22ud6OFOyhgg), paste the license key from your receipt, and click **Activate**. A key works on up to 3 browsers.
 
 ## ChatShelf Pro
 
